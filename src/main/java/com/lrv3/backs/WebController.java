@@ -1,6 +1,7 @@
 package com.lrv3.backs;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import lombok.val;
 
 @Controller
 
@@ -27,31 +31,55 @@ public class WebController {
     }
 
     @PostMapping("/form")
-    public String form(Model model){
+    public String form(Model model, @RequestParam(name = "backupCompleto",  required = false) String backupCompleto,
+    @RequestParam(name = "backupDiferencial",  required = false) String backupDiferencial){
 
 
         Connection conn = null;
  
         try {
  
-            String dbURL = "jdbc:sqlserver://localhost:1433;database=bdUsuarios;user=sa;password=sa";
+            // String dbURL = "jdbc:sqlserver://BDSERVER1/MSSQLSERVER2;database=bdUsuarios;user=sa;password=sa";
+            // String dbURL = "jdbc:sqlserver://BDSERVER1/MSSQLSERVER2;database=bdUsuarios;user=sa;password=sa;integratedSecurity=true;";
+            String dbURL = "jdbc:sqlserver://127.0.0.1;database=bdUsuarios;user=sa;password=sa";
+            // INNOWAVE-99\SQLEXPRESS01
           
             conn = DriverManager.getConnection(dbURL);
             
 
             Statement stmt = conn.createStatement();
 
-            String sql = "USE bdUsuarios "+
-            // " GO "+
-            " BACKUP DATABASE bdUsuarios "+
-            " TO  DISK = N'D:/DatabaseBackups/CE3.bak' "+
-            " WITH CHECKSUM ";
+            String sql = "";
 
+            if(backupCompleto == "true"){
+                sql = "USE bdUsuarios "+
+                // " GO "+
+                " BACKUP DATABASE bdUsuarios "+
+                " TO  DISK = N'C:/DatabaseBackups/CE3.bak' "+
+                " WITH CHECKSUM ";
+            }
+
+            if(backupDiferencial == "true"){
+                sql = "USE bdUsuarios "+
+                // " GO "+
+                " BACKUP DATABASE bdUsuarios "+
+                " TO  DISK = N'C:/DatabaseBackups/CE3.bak' "+
+                " WITH CHECKSUM ";
+            }
 
 
             int val = stmt.executeUpdate(sql);
+            System.out.println(val);
 
-            System.out.println("En el form");
+            // conn = DriverManager.getConnection(dbURL);
+            if (conn != null) {
+                DatabaseMetaData dm = (DatabaseMetaData) conn.getMetaData();
+                System.out.println("Driver name: " + dm.getDriverName());
+                System.out.println("Driver version: " + dm.getDriverVersion());
+                System.out.println("Product name: " + dm.getDatabaseProductName());
+                System.out.println("Product version: " + dm.getDatabaseProductVersion());
+            }
+
  
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -65,7 +93,6 @@ public class WebController {
             }
         }
 
-        System.out.println("En el form");
         return "index";
     }
 
