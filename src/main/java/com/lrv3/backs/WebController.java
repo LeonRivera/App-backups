@@ -43,22 +43,61 @@ public class WebController {
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public String index() {
         
-        String comandoRespaldo = "cmd.exe /K C:/Users/L/Desktop/respaldo.bat";
-        String comandoExport = "cmd.exe /K C:/Users/L/Desktop/export.bat";
-        String comandoRestore = "cmd.exe /K C:/Users/L/Desktop/restauracion.bat";
-        String comandoImport = "cmd.exe /K C:/Users/L/Desktop/import.bat";
+        // String comandoRespaldo = "cmd.exe /K C:/Users/L/Desktop/respaldo.bat";
+        // String comandoExport = "cmd.exe /K C:/Users/L/Desktop/export.bat";
+        // String comandoRestore = "cmd.exe /K C:/Users/L/Desktop/restauracion.bat";
+        // String comandoImport = "cmd.exe /K C:/Users/L/Desktop/import.bat";
 
-        System.out.println("En index");
+        // System.out.println("En index");
 
+        
+
+        return "index";
+    }
+
+    public void execCommands(String command){
         try {
-            Process process = Runtime.getRuntime().exec(CMD_IMPORT);
+            Process process = Runtime.getRuntime().exec(command);
             printResults(process);
             // process.destroy();
         } catch (IOException e) {
             
         }
+    }
 
-        return "index";
+    @GetMapping("/formbasenorel")
+    public String formBaseNoRel(Model model){
+        return "formBaseNoRel";
+    }
+
+    @PostMapping("/formbasenorel")
+    public String formBaseNoRel(Model model, @RequestParam(name = "dump", required = false) String dump,
+    @RequestParam(name = "restore", required = false) String restore, 
+    @RequestParam(name = "export", required = false) String export,
+    @RequestParam(name = "import", required = false) String importBd){
+
+        System.out.println("Form base no rel");
+
+        if(dump != null){
+            if(dump.equals("true")){
+                execCommands(CMD_DUMP);
+            }
+        }else if(restore != null){
+            if(restore.equals("true")){
+                execCommands(CMD_RESTORE);
+            }
+        }else if(export != null){
+            System.out.println("Ejecutando export");
+            if(export.equals("true")){
+                execCommands(CMD_EXPORT);
+            }
+        }else if(importBd != null){
+            if(importBd.equals("true")){
+                execCommands(CMD_IMPORT);
+            }
+        }
+
+        return "formBaseNoRel";
     }
 
 
